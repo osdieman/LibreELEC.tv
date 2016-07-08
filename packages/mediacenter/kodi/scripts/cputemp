@@ -23,12 +23,27 @@
 
 TEMP=0
 
+isAmlThermal="no";
+if [ -d '/sys/bus/platform/devices/aml_thermal' ]; then
+  isAmlThermal="yes";
+fi
+
 if [ $(basename "$0") = "gputemp" -o "$1" = "gpu" ]; then
   if which lspci >/dev/null; then
     if lspci -n | grep 0300 | grep -q 10de; then
       [ -x /usr/bin/nvidia-smi ] && TEMP=`/usr/bin/nvidia-smi -q -x | grep '<gpu_temp>' | awk '{ print $1 }' | sed 's,<gpu_temp>,,g'`
     fi
   fi
+fi
+
+if [ "$isAmlThermal" = "yes" -a "$TEMP" = "0" ]; then
+  if [ -f /sys/class/thermal/thermal_zone1/temp ]; then
+    TEMP=`cat /sys/class/thermal/thermal_zone1/temp`
+  fi
+
+  if [ "$TEMP" = "0" -a -f /sys/class/thermal/thermal_zone0/temp ]; then
+    TEMP=`cat /sys/class/thermal/thermal_zone0/temp`
+  fi  
 fi
 
 if [ "$1" = "cpu" -o "$TEMP" = "0" ]; then
