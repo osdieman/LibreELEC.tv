@@ -52,20 +52,52 @@ echo 0 > /sys/class/graphics/fb0/free_scale
 echo 1 > /sys/class/video/disable_video
 
 # Set framebuffer geometry to match the resolution
+bpp=32;
+xRes=1280;
+yRes=720;
+maxCap=$(tail -n1 /sys/class/amhdmitx/amhdmitx0/disp_cap | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//');
+if [ -z "$maxCap" ]; then
+  maxCap=$hdmimode;
+fi
+case $maxCap in
+  1080*)
+    xRes=1920;
+    yRes=1080;
+  ;;
+  4k2k*hz*)
+    xRes=3840;
+    yRes=2160;
+  ;;
+  4k2ksmpte)
+    xRes=4096;
+    yRes=2160;
+  ;;
+esac
+vXRes=$xRes;
+vYRes=$(( $yRes * 2 ));
+
 case "$hdmimode" in
   720*)
-    fbset -fb /dev/fb0 -g 1280 720 1920 2160 32
-    ;;
+    if [ "$vXRes" -ge 1280 -a "$vYRes" -ge 1440 ]; then
+      xRes=1280;
+      yRes=720;
+    fi
+  ;;
   1080*)
-    fbset -fb /dev/fb0 -g 1920 1080 1920 2160 32
-    ;;  
+    if [ "$vXRes" -ge 1920 -a "$vYRes" -ge 2160 ]; then
+      xRes=1920;
+      yRes=1080;
+    fi
+  ;;
   4k2k*hz*)
-    fbset -fb /dev/fb0 -g 3840 2160 3840 4320 32
-    ;;  
-  4k2ksmpte)
-    fbset -fb /dev/fb0 -g 4096 2160 4096 4320 32
-    ;;
+    if [ "$vXRes" -ge 3840 -a "$vYRes" -ge 4320 ]; then
+      xRes=3840;
+      yRes=2160;
+    fi
+  ;;
 esac
+
+fbset -fb /dev/fb0 -g $xRes $yRes $vXRes $vYRes $bpp;
 
 # Include deinterlacer into default VFM map
 echo rm default > /sys/class/vfm/map
