@@ -1,0 +1,11 @@
+diff -Naur kodi-17.0-alpha2-f3ca4ea.orig/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp kodi-17.0-alpha2-f3ca4ea/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
+--- kodi-17.0-alpha2-f3ca4ea.orig/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp	2016-07-12 15:10:39.686143367 +0200
++++ kodi-17.0-alpha2-f3ca4ea/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp	2016-07-12 15:13:02.000000000 +0200
+@@ -538,7 +538,6 @@
+   if (aml_present())
+   {
+     aml_set_audio_passthrough(m_passthrough);
+-    device = "default";
+   }
+ #endif
+ 
