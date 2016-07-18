@@ -1,0 +1,49 @@
+diff -Naur linux-amlogic-3.10-c8d5b2f.orig/drivers/amlogic/Makefile linux-amlogic-3.10-c8d5b2f/drivers/amlogic/Makefile
+--- linux-amlogic-3.10-c8d5b2f.orig/drivers/amlogic/Makefile	2016-07-18 01:14:40.606769984 +0200
++++ linux-amlogic-3.10-c8d5b2f/drivers/amlogic/Makefile	2016-07-18 01:15:04.000000000 +0200
+@@ -75,7 +75,7 @@
+ 
+ obj-$(CONFIG_AML_EXT_HDMIIN) += ext_hdmiin/
+ 
+-#obj-y += thermal/
++obj-y += thermal/
+ 
+ 
+ #####Sound system is later init in kernel default..######################
+diff -Naur linux-amlogic-3.10-c8d5b2f.orig/drivers/amlogic/thermal/Makefile linux-amlogic-3.10-c8d5b2f/drivers/amlogic/thermal/Makefile
+--- linux-amlogic-3.10-c8d5b2f.orig/drivers/amlogic/thermal/Makefile	2016-07-18 01:14:40.626769984 +0200
++++ linux-amlogic-3.10-c8d5b2f/drivers/amlogic/thermal/Makefile	2016-07-18 01:19:29.000000000 +0200
+@@ -1,4 +1,4 @@
+ #
+ #Makefile for the thermal dirver
+ #
+-obj-$(CONFIG_AMLOGIC_THERMAL)+= amlogic_thermal.o
++obj-$(CONFIG_AML_PLATFORM_THERMAL)+= amlogic_thermal.o
+diff -Naur linux-amlogic-3.10-c8d5b2f.orig/drivers/thermal/gpu_cooling.c linux-amlogic-3.10-c8d5b2f/drivers/thermal/gpu_cooling.c
+--- linux-amlogic-3.10-c8d5b2f.orig/drivers/thermal/gpu_cooling.c	2016-07-18 01:14:40.910769986 +0200
++++ linux-amlogic-3.10-c8d5b2f/drivers/thermal/gpu_cooling.c	2016-07-18 01:17:26.000000000 +0200
+@@ -235,6 +235,7 @@
+ }
+ EXPORT_SYMBOL_GPL(gpufreq_cooling_unregister);
+ 
++#if defined(CONFIG_AML_VIRTUAL_THERMAL) && !defined(CONFIG_AML_PLATFORM_THERMAL)
+ unsigned int (*gpu_freq_callback)(void) = NULL;
+ int register_gpu_freq_info(unsigned int (*fun)(void))
+ {
+@@ -245,3 +246,4 @@
+ }
+ EXPORT_SYMBOL(register_gpu_freq_info);
+ EXPORT_SYMBOL(gpu_freq_callback);
++#endif
+diff -Naur linux-amlogic-3.10-c8d5b2f.orig/include/linux/thermal.h linux-amlogic-3.10-c8d5b2f/include/linux/thermal.h
+--- linux-amlogic-3.10-c8d5b2f.orig/include/linux/thermal.h	2016-07-18 01:14:40.026769980 +0200
++++ linux-amlogic-3.10-c8d5b2f/include/linux/thermal.h	2016-07-18 01:18:57.000000000 +0200
+@@ -259,7 +259,7 @@
+ }
+ #endif
+ 
+-#ifdef CONFIG_AMLOGIC_THERMAL
++#ifdef CONFIG_AML_PLATFORM_THERMAL
+ #include <mach/thermal.h>
+ #endif /* CONFIG_AMLOGIC_THERMAL */
+ 
